@@ -6,22 +6,29 @@ import { validationResult } from "express-validator";
 
 
 export const CreateShortUrl = async (req, res) => {
-    const Result = validationResult(req);
+    try {
+        const Result = validationResult(req);
 
-    if (!Result.isEmpty()) return res.send({ error: Result.array() });
+        if (!Result.isEmpty()) return res.status(400).json({ error: Result.array() });
 
-    const { url, slug } = req.body;
-    let ShortUrl;
+        const { url, slug } = req.body;
+        let ShortUrl;
 
-    slug ? ShortUrl = slug : ShortUrl = CreateNanoID(6);
+        slug ? ShortUrl = slug : ShortUrl = CreateNanoID(6);
 
-    const hasShortUrl = await CheckShortUrl(ShortUrl);
+        const hasShortUrl = await CheckShortUrl(ShortUrl);
 
-    if (hasShortUrl) return res.status(400).json({error:"Already Exists"});
+        if (hasShortUrl) return res.status(400).json({ error: "Already Exists" });
 
-    const data = await StoreShortUrl(url, ShortUrl, req.user?.id);
+        const data = await StoreShortUrl(url, ShortUrl, req.user?.id);
 
-    res.status(200).json({ ShortUrl: process.env.Domain + data.Short_Url });
+        if (!data) return res.status(500).json({ error: "Failed to create short URL" });
+
+        res.status(200).json({ ShortUrl: process.env.Domain + data.Short_Url });
+    } catch (error) {
+        console.error("Error creating short URL:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 }
 
 
