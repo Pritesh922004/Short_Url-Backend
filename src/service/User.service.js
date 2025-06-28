@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import TokenModel from '../models/token.js';
 
 
 export const hash = async (password)=>{
@@ -34,3 +35,4 @@ export const VerifyToken = async (token)=>{
         console.log(error);
     }
 }
+
