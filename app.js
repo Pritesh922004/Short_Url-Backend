@@ -15,7 +15,12 @@ import { DeleteUrls } from "./src/controllers/DeleteUrl.controller.js";
 const app = express();
 const port = process.env.PORT;
 
-app.use(cors({origin:process.env.FRONTEND_URL,credentials:true}));
+const allowedOrigins = [
+    'http://localhost:5173',
+    process.env.FRONTEND_URL
+];
+
+app.use(cors({origin:allowedOrigins,credentials:true},));
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
