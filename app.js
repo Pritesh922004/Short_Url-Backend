@@ -15,12 +15,7 @@ import { DeleteUrls } from "./src/controllers/DeleteUrl.controller.js";
 const app = express();
 const port = process.env.PORT;
 
-const allowedOrigins = [
-    'http://localhost:5173',
-    process.env.FRONTEND_URL
-];
-
-app.use(cors({origin:allowedOrigins,credentials:true},));
+app.use(cors({origin:process.env.FRONTEND_URL,credentials:true},));
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -28,9 +23,12 @@ app.use(cookieParser())
 
 
 app.use(CheckUserId);
-
+app.get('/',(req,res)=>{
+    res.send("Hello World");
+})
 app.use("/ShortUrl",short_url);
 app.use('/user',User);
+
 
 app.get('/:id',
     param('id')
