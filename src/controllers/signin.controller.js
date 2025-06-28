@@ -15,7 +15,7 @@ export const SignIn = async (req,res)=>{
 
     const user = await FindUser(email);
 
-    if(!user) return res.status(400).json({error:" Credentials"});
+    if(!user) return res.status(400).json({error:"Invalid Credentials"});
 
     const isPasswordValid = await ComparePassword(password,user.password);
 
