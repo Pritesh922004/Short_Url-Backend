@@ -17,38 +17,38 @@ const port = process.env.PORT;
 
 //app.use(cors({origin:'https://short-url-dusky-ten.vercel.app/',credentials:true},));
 app.use(cors({
-  origin: process.env.FRONTEND_URL.replace(/\/$/, ''),
-  credentials: true
+    origin: [process.env.FRONTEND_URL.replace(/\/$/, ''),"http://localhost:5173"],
+    credentials: true
 }));
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
 
 app.use(CheckUserId);
-app.get('/',(req,res)=>{
+app.get('/', (req, res) => {
     res.send("Hello World");
 })
-app.use("/ShortUrl",short_url);
-app.use('/user',User);
+app.use("/ShortUrl", short_url);
+app.use('/user', User);
 
 
 app.get('/:id',
     param('id')
-    .notEmpty().withMessage("ShortUrlID is Missing In ShortUrl")
-    .isString().withMessage("Invalid ShortUrl")
-    .trim()
-    ,RedirectToUrl);
+        .notEmpty().withMessage("ShortUrlID is Missing In ShortUrl")
+        .isString().withMessage("Invalid ShortUrl")
+        .trim()
+    , RedirectToUrl);
 app.post('/delete',
     body('id')
-    .notEmpty().withMessage("ShortUrlID is Missing In ShortUrl")
-    .trim()
-    ,DeleteUrls);
+        .notEmpty().withMessage("ShortUrlID is Missing In ShortUrl")
+        .trim()
+    , DeleteUrls);
 
 ConnectDB();
 
 
-app.listen(port,()=>{
+app.listen(port, () => {
     console.log(`Server is running on ${port}`);
 })
