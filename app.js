@@ -17,7 +17,7 @@ const port = process.env.PORT;
 
 //app.use(cors({origin:'https://short-url-dusky-ten.vercel.app/',credentials:true},));
 app.use(cors({
-    origin: [process.env.FRONTEND_URL.replace(/\/$/, ''),"http://localhost:5173"],
+    origin: [process.env.FRONTEND_URL.replace(/\/$/, ''),"https://shorturl-priteshs-projects-702bd372.vercel.app","https://shorturl-git-main-priteshs-projects-702bd372.vercel.app"],
     credentials: true
 }));
 
