@@ -5,6 +5,7 @@ import cors from 'cors';
 import { body, param } from "express-validator";
 import User from "./src/Routes/User.routes.js";
 import short_url from "./src/Routes/Short_Url.routes.js";
+import adminRoutes from "./src/admin/admin.routes.js";
 import ConnectDB from "./src/config/Connectdb.js";
 import { RedirectToUrl } from "./src/controllers/CreateShortUrl.controller.js";
 import { CheckUserId } from "./src/middleware/Add_User.js";
@@ -59,6 +60,7 @@ app.get('/', (req, res) => {
 })
 app.use("/ShortUrl", short_url);
 app.use('/user', User);
+app.use('/admin', adminRoutes);
 
 
 app.get('/:id',
