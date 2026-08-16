@@ -27,7 +27,7 @@ if(!token) return res.status(500).json({error:"Something went wrong"});
     
     delete data._doc.password;
 
-    res.cookie("Access",token,cookieOptions());
+    res.cookie("Access", token, cookieOptions());
 
-    res.status(201).json({message:"Signup Successfully"});
-}
+    res.status(201).json({ message: "Signup Successfully", user: data, token: token });
+}

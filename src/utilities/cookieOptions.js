@@ -1,10 +1,15 @@
 export const cookieOptions = () => {
-    const isProduction = process.env.NODE_ENV === "production" && !process.env.Domain?.includes("localhost");
+    const isLocalhost = Boolean(
+        (process.env.Domain && process.env.Domain.includes("localhost")) ||
+        (process.env.FRONTEND_URL && process.env.FRONTEND_URL.includes("localhost"))
+    );
+    const isSecure = process.env.NODE_ENV === "production" || Boolean(process.env.RAILWAY_ENVIRONMENT) || !isLocalhost;
     return {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
+        secure: isSecure,
+        sameSite: isSecure ? "none" : "lax",
         path: "/"
     };
-};
+};
+

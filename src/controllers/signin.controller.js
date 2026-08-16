@@ -27,7 +27,8 @@ export const SignIn = async (req,res)=>{
 
     delete user._doc.password;
 
-    res.cookie("Access",token,cookieOptions());
+    res.cookie("Access", token, cookieOptions());
 
-    res.status(200).json({message:"Login Successfully",user:user});
+    res.status(200).json({ message: "Login Successfully", user: user, token: token });
 }
+

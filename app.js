@@ -14,8 +14,10 @@ import morgan from "morgan";
 
 
 const app = express();
+app.set('trust proxy', 1);
 const port = process.env.PORT || 3000;
 app.use(morgan('dev'));
+
 
 const allowedOrigins = [
     "http://localhost:5173",
