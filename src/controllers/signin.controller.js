@@ -7,7 +7,7 @@ import { cookieOptions } from "../utilities/cookieOptions.js";
 export const SignIn = async (req,res)=>{
     const result = validationResult(req);
 
-    if (!result.isEmpty()) return res.send({ error: result.array() });
+    if (!result.isEmpty()) return res.status(400).json({ error: result.array()[0].msg });
 
     const { email, password } = req.body;
 

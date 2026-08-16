@@ -7,7 +7,7 @@ export const Signup = async (req, res) => {
 
     const Result = validationResult(req);
 
-    if (!Result.isEmpty()) return res.send({ error: Result.array() });
+    if (!Result.isEmpty()) return res.status(400).json({ error: Result.array()[0].msg });
 
     const { name, email, password } = req.body;
 

@@ -10,20 +10,38 @@ import { RedirectToUrl } from "./src/controllers/CreateShortUrl.controller.js";
 import { CheckUserId } from "./src/middleware/Add_User.js";
 import cookieParser from "cookie-parser";
 import { DeleteUrls } from "./src/controllers/DeleteUrl.controller.js";
+import morgan from "morgan";
 
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
+app.use(morgan('dev'));
+
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://shorturl-priteshs-projects-702bd372.vercel.app",
+    "https://shorturl-git-main-priteshs-projects-702bd372.vercel.app",
+    "https://short-url-frontend-omega.vercel.app"
+];
+
+if (process.env.FRONTEND_URL) {
+    allowedOrigins.push(process.env.FRONTEND_URL.replace(/\/$/, ''));
+}
 
 app.use(cors({
-    origin: [
-        process.env.FRONTEND_URL.replace(/\/$/, ''),
-        "https://shorturl-priteshs-projects-702bd372.vercel.app",
-        "https://shorturl-git-main-priteshs-projects-702bd372.vercel.app"
-    ],
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps, curl, server-to-server)
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(null, true); // Alternatively allow all in CORS or whitelist
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -53,7 +71,18 @@ app.post('/delete',
         .trim()
     , DeleteUrls);
 
+// 404 Catch-All Handler for Unmatched Backend Routes
+app.use((req, res) => {
+    res.status(404).json({
+        success: false,
+        statusCode: 404,
+        error: "Route Not Found",
+        message: `Cannot ${req.method} ${req.originalUrl}`
+    });
+});
+
 ConnectDB();
+
 
 
 app.listen(port, () => {
