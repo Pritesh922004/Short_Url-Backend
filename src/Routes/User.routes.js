@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { Signup } from '../controllers/signup.controller.js';
+import { Signup, SendSignupOtpController } from '../controllers/signup.controller.js';
 import { SignIn } from '../controllers/signin.controller.js';
 import { VerifyUser } from '../controllers/VerifyUser.controller.js';
 import { Auth } from '../middleware/Auth.middleware.js';
@@ -14,6 +14,14 @@ import {
 const route = express.Router();
 
 // Registration & Login
+route.post('/send-signup-otp',
+    body('email')
+        .notEmpty().withMessage("Email is required")
+        .isEmail().withMessage("Please provide a valid email address")
+        .trim(),
+    SendSignupOtpController
+);
+
 route.post('/signup',
     body('name')
         .notEmpty().withMessage("Name is required")
@@ -29,8 +37,13 @@ route.post('/signup',
         .notEmpty().withMessage("Password is required")
         .isString().withMessage("Password should be a string")
         .trim()
-        .isLength({ min: 6 }).withMessage("Password should be at least 6 characters")
+        .isLength({ min: 6 }).withMessage("Password should be at least 6 characters"),
+    body('otp')
+        .notEmpty().withMessage("Verification code is required")
+        .isLength({ min: 6, max: 6 }).withMessage("Verification code must be 6 digits")
+        .trim()
     , Signup);
+
 
 route.post('/signin',
     body('email')
