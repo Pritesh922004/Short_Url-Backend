@@ -34,6 +34,7 @@ const createTransporter = () => {
         socketTimeout: 15000,
         family: 4, // Force IPv4 connection to prevent ENETUNREACH
         tls: {
+            servername: 'smtp.gmail.com',
             rejectUnauthorized: false
         }
     });
