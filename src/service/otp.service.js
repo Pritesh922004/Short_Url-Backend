@@ -1,8 +1,42 @@
 import nodemailer from "nodemailer";
+import dns from "dns";
+
+// Force Node.js DNS lookup to prioritize IPv4 over IPv6.
+// Fixes 'connect ENETUNREACH <IPv6>:465' on Railway & cloud hosting.
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder("ipv4first");
+}
 
 export const GenerateOtp = () => {
     // Generate a 6-digit random numeric string
     return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+const createTransporter = () => {
+    const rawHost = process.env.SMTP_HOST?.trim();
+    // If SMTP_HOST is 'gmail' or omitted, map to 'smtp.gmail.com'
+    const host = (rawHost && rawHost.toLowerCase() !== "gmail") ? rawHost : "smtp.gmail.com";
+    
+    // Default to port 587 (STARTTLS) if not explicitly set to 465
+    const port = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587;
+    const secure = process.env.SMTP_SECURE === "true" || port === 465;
+
+    return nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 15000,
+        family: 4, // Force IPv4 connection to prevent ENETUNREACH
+        tls: {
+            rejectUnauthorized: false
+        }
+    });
 };
 
 export const SendOtpEmail = async (email, otp) => {
@@ -10,16 +44,7 @@ export const SendOtpEmail = async (email, otp) => {
 
     if (hasSmtpConfig) {
         try {
-            const transporter = nodemailer.createTransport({
-                service: process.env.EMAIL_SERVICE || "gmail",
-                host: process.env.SMTP_HOST || undefined,
-                port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined,
-                secure: process.env.SMTP_SECURE === "true",
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
-                }
-            });
+            const transporter = createTransporter();
 
             const mailOptions = {
                 from: `"LinkVault Security" <${process.env.EMAIL_USER}>`,
@@ -54,7 +79,9 @@ export const SendOtpEmail = async (email, otp) => {
             return { success: true, method: "smtp" };
         } catch (error) {
             console.error("[SMTP ERROR] Failed to send email via nodemailer:", error.message);
-            // Fallback to console output if SMTP fails
+            if (process.env.NODE_ENV === "production") {
+                throw new Error(`Email delivery failed: ${error.message}`);
+            }
         }
     }
 
@@ -74,16 +101,7 @@ export const SendSignupOtpEmail = async (email, otp) => {
 
     if (hasSmtpConfig) {
         try {
-            const transporter = nodemailer.createTransport({
-                service: process.env.EMAIL_SERVICE || "gmail",
-                host: process.env.SMTP_HOST || undefined,
-                port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined,
-                secure: process.env.SMTP_SECURE === "true",
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
-                }
-            });
+            const transporter = createTransporter();
 
             const mailOptions = {
                 from: `"LinkVault Security" <${process.env.EMAIL_USER}>`,
@@ -118,7 +136,9 @@ export const SendSignupOtpEmail = async (email, otp) => {
             return { success: true, method: "smtp" };
         } catch (error) {
             console.error("[SMTP ERROR] Failed to send signup email via nodemailer:", error.message);
-            // Fallback to console output if SMTP fails
+            if (process.env.NODE_ENV === "production") {
+                throw new Error(`Email delivery failed: ${error.message}`);
+            }
         }
     }
 
@@ -132,4 +152,5 @@ export const SendSignupOtpEmail = async (email, otp) => {
 
     return { success: true, method: "console", otp };
 };
+
 
