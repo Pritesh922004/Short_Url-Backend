@@ -13,6 +13,13 @@ const createTransporter = () => {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
         },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 15000,
+        family: 4, // Force IPv4 connection to prevent ENETUNREACH
+        tls: {
+            rejectUnauthorized: false
+        }
     });
 };
 
